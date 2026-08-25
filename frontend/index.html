@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raga Practice Analyzer — Hindustani Classical Music</title>
+  <meta name="description" content="Real-time Hindustani Classical Music Raga Practice Analyzer. Sings along with your raga, gives live feedback on pitch accuracy, raga match percentage, and stability." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Ambient background particles -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="app-shell">
+
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <header class="header glass" role="banner">
+      <div class="header-brand">
+        <span class="brand-icon" aria-hidden="true">🎵</span>
+        <div>
+          <h1 class="brand-title">Raga Practice Analyzer</h1>
+          <p class="brand-sub">Hindustani Classical Music · Real-time Feedback</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="control-group">
+          <label for="raga-select" class="control-label">Target Raga</label>
+          <select id="raga-select" class="select-input" title="Choose a raga to practice">
+            <option value="">— Select Raga —</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Tonic (Sa)</label>
+          <div class="tonic-display" id="tonic-display" title="Current tonic in Hz">— Hz</div>
+        </div>
+
+        <button id="btn-calibrate" class="btn btn-secondary" title="Calibrate Sa (hold Sa for 3 seconds)">
+          <span class="btn-icon">🎙</span> Calibrate Sa
+        </button>
+
+        <button id="btn-start" class="btn btn-primary" title="Start / Stop practice session">
+          <span class="btn-icon" id="start-icon">▶</span>
+          <span id="start-label">Start Practice</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Status bar ──────────────────────────────────────────────── -->
+    <div class="status-bar" role="status" aria-live="polite">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Not connected — click Start Practice</span>
+      <div class="status-spacer"></div>
+      <span id="current-swar-badge" class="swar-badge" aria-label="Current swar being sung">–</span>
+    </div>
+
+    <!-- ── Main grid ───────────────────────────────────────────────── -->
+    <main class="main-grid" role="main">
+
+      <!-- Pitch Contour (full width top) -->
+      <section class="panel panel-pitch glass" aria-label="Live pitch contour">
+        <div class="panel-header">
+          <h2 class="panel-title">Live Pitch Contour</h2>
+          <span class="panel-sub">Sa-relative · last 10 seconds</span>
+        </div>
+        <canvas id="pitch-canvas" class="pitch-canvas" role="img" aria-label="Scrolling pitch contour graph"></canvas>
+        <div class="swar-axis" id="swar-axis" aria-hidden="true"></div>
+      </section>
+
+      <!-- Raga Graph -->
+      <section class="panel panel-raga glass" aria-label="Raga structure overlay">
+        <div class="panel-header">
+          <h2 class="panel-title">Raga Structure</h2>
+          <span class="panel-sub" id="raga-graph-subtitle">Select a raga to begin</span>
+        </div>
+        <div class="raga-graph-container" id="raga-graph-container">
+          <div class="raga-empty-state" id="raga-empty-state">
+            <span class="empty-icon">🪘</span>
+            <p>Select a raga from the dropdown<br>to see its aroha/avaroha structure</p>
+          </div>
+          <svg id="raga-svg" class="raga-svg" aria-label="Raga aroha avaroha graph" style="display:none"></svg>
+        </div>
+      </section>
+
+      <!-- Score Cards -->
+      <section class="panel panel-scores glass" aria-label="Practice scores">
+        <div class="panel-header">
+          <h2 class="panel-title">Practice Scores</h2>
+        </div>
+
+        <!-- Raga Match -->
+        <div class="score-card" id="card-match">
+          <div class="score-card-header">
+            <span class="score-label">Raga Match</span>
+            <span class="score-value" id="match-value">—</span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar" id="match-bar" style="width:0%"></div>
+          </div>
+          <div class="score-breakdown" id="match-breakdown">
+            <span class="bd-item" id="bd-conform">Swars: —</span>
+            <span class="bd-item" id="bd-trans">Transitions: —</span>
+            <span class="bd-item" id="bd-pakad">Pakad: —</span>
+            <span class="bd-item" id="bd-vadi">Vadi: —</span>
+          </div>
+        </div>
+
+        <!-- Pitch Stability -->
+        <div class="score-card" id="card-stability">
+          <div class="score-card-header">
+            <span class="score-label">Pitch Stability</span>
+            <span class="score-value" id="stability-value">—</span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar stability-bar" id="stability-bar" style="width:0%"></div>
+          </div>
+          <div class="score-breakdown">
+            <span class="bd-item" id="bd-stability-label">Sing a sustained note to measure</span>
+          </div>
+        </div>
+
+        <!-- Gauge Arc (Raga Match visual) -->
+        <div class="gauge-container" aria-hidden="true">
+          <canvas id="gauge-canvas" class="gauge-canvas" width="200" height="120"></canvas>
+          <div class="gauge-value-overlay" id="gauge-overlay">—</div>
+        </div>
+
+        <!-- Info block -->
+        <div class="info-block" id="vadi-info">
+          <span class="info-label">Vadi</span>
+          <span class="info-val" id="vadi-val">—</span>
+          <span class="info-sep">·</span>
+          <span class="info-label">Samvadi</span>
+          <span class="info-val" id="samvadi-val">—</span>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── Calibration overlay ─────────────────────────────────────── -->
+    <div id="calibration-overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Tonic calibration" style="display:none">
+      <div class="overlay-card glass">
+        <h2 class="overlay-title">Calibrate Your Sa</h2>
+        <p class="overlay-desc">Sing or play your <strong>Sa</strong> (tonic) clearly and hold it steady.</p>
+        <div class="calibration-timer" id="cal-timer">3</div>
+        <div class="calibration-wave" id="cal-wave" aria-hidden="true">
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+        </div>
+        <div class="calibration-result" id="cal-result" style="display:none"></div>
+        <button id="btn-cal-cancel" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+
+  </div><!-- /app-shell -->
+
+  <!-- Scripts (module type so AudioWorklet can be registered) -->
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>

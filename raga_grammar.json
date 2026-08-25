@@ -1,0 +1,397 @@
+{
+  "Yaman": {
+    "alternate_names": ["Yaman Kalyan", "Kalyan"],
+    "aroha": ["Sa", "Re", "Ga", "ma", "Pa", "Dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "Pa", "ma", "Ga", "Re", "Sa"],
+    "pakad": [
+      ["Ni", "Re", "Ga", "Re", "Sa"],
+      ["Ga", "ma", "Dha", "Pa"],
+      ["ma", "Dha", "Ni", "Sa'"]
+    ],
+    "vadi": "Ga",
+    "samvadi": "Ni",
+    "scale_swars": ["Sa", "Re", "Ga", "ma", "Pa", "Dha", "Ni"],
+    "forbidden_swars": ["Ma", "re", "ga", "dha", "ni"],
+    "time_of_day": "evening",
+    "thaat": "Kalyan",
+    "description": "Evening raga with tivra (sharp) Ma as its signature note",
+    "cents": {"Sa":0,"Re":200,"Ga":400,"ma":600,"Pa":700,"Dha":900,"Ni":1100}
+  },
+  "Bhairav": {
+    "alternate_names": [],
+    "aroha": ["Sa", "re", "Ga", "Ma", "Pa", "dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "dha", "Pa", "Ma", "Ga", "re", "Sa"],
+    "pakad": [
+      ["re", "Sa", "Ni", "Sa", "re", "Ga"],
+      ["Ga", "Ma", "dha", "Pa"],
+      ["Sa", "re", "Sa", "Ni", "dha", "Pa"]
+    ],
+    "vadi": "dha",
+    "samvadi": "re",
+    "scale_swars": ["Sa", "re", "Ga", "Ma", "Pa", "dha", "Ni"],
+    "forbidden_swars": ["Re", "ga", "ma", "Dha", "ni"],
+    "time_of_day": "morning",
+    "thaat": "Bhairav",
+    "description": "Early morning raga with komal Re and komal Dha",
+    "cents": {"Sa":0,"re":100,"Ga":400,"Ma":500,"Pa":700,"dha":800,"Ni":1100}
+  },
+  "Bhairavi": {
+    "alternate_names": [],
+    "aroha": ["Sa", "re", "ga", "Ma", "Pa", "dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "dha", "Pa", "Ma", "ga", "re", "Sa"],
+    "pakad": [
+      ["Sa", "ga", "re", "Sa", "ni", "dha", "Pa"],
+      ["ga", "Ma", "Pa", "dha", "ni", "Sa'"]
+    ],
+    "vadi": "Ma",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "re", "ga", "Ma", "Pa", "dha", "ni"],
+    "forbidden_swars": ["Re", "Ga", "ma", "Dha", "Ni"],
+    "time_of_day": "morning",
+    "thaat": "Bhairavi",
+    "description": "All komal swaras except Pa and Sa; farewell raga",
+    "cents": {"Sa":0,"re":100,"ga":300,"Ma":500,"Pa":700,"dha":800,"ni":1000}
+  },
+  "Bhimpalasi": {
+    "alternate_names": ["Bhimpalas"],
+    "aroha": ["Sa", "ga", "Ma", "Pa", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Dha", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["ni", "Sa'", "ni", "Dha", "Pa"],
+      ["Ma", "Pa", "ni", "Sa'"],
+      ["ga", "Ma", "Re", "Sa"]
+    ],
+    "vadi": "Pa",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "Dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "dha", "Ni"],
+    "time_of_day": "afternoon",
+    "thaat": "Kafi",
+    "description": "Afternoon raga; Re and Dha used only in avaroha",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"Dha":900,"ni":1000}
+  },
+  "Darbari Kanada": {
+    "alternate_names": ["Darbari"],
+    "aroha": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "dha", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["Re", "ga", "Re", "Sa"],
+      ["Ma", "Pa", "dha", "ni", "dha", "Pa"],
+      ["ga", "Re", "ga", "Ma", "Pa"]
+    ],
+    "vadi": "Re",
+    "samvadi": "Pa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "Dha", "Ni"],
+    "time_of_day": "late_night",
+    "thaat": "Asavari",
+    "description": "Midnight raga; andolan (oscillation) on ga and dha is characteristic",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"dha":800,"ni":1000}
+  },
+  "Bageshri": {
+    "alternate_names": ["Bageshree"],
+    "aroha": ["Sa", "ga", "Ma", "Dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Dha", "Ma", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["Dha", "ni", "Sa'", "ni", "Dha"],
+      ["Ma", "Dha", "ni", "Dha", "Pa"],
+      ["ga", "Ma", "Re", "Sa"]
+    ],
+    "vadi": "Ma",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "Dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "dha", "Ni"],
+    "time_of_day": "midnight",
+    "thaat": "Kafi",
+    "description": "Midnight raga with Pa as a vakra (zigzag) note",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"Dha":900,"ni":1000}
+  },
+  "Kedar": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Ma", "ma", "Pa", "Dha", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "Pa", "Ma", "ma", "Ga", "Ma", "Re", "Sa"],
+    "pakad": [
+      ["Sa", "Ma", "Pa", "Dha", "Sa'"],
+      ["Ma", "ma", "Pa"],
+      ["Ni", "Dha", "Pa", "Ma"]
+    ],
+    "vadi": "Ma",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "Ga", "Ma", "ma", "Pa", "Dha", "Ni"],
+    "forbidden_swars": ["re", "ga", "dha", "ni"],
+    "time_of_day": "evening",
+    "thaat": "Kalyan",
+    "description": "Evening raga using both Ma and tivra ma; Re and Ga skipped in aroha",
+    "cents": {"Sa":0,"Re":200,"Ga":400,"Ma":500,"ma":600,"Pa":700,"Dha":900,"Ni":1100}
+  },
+  "Malkauns": {
+    "alternate_names": ["Malkaus", "Malkosh"],
+    "aroha": ["Sa", "ga", "Ma", "dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "dha", "Ma", "ga", "Sa"],
+    "pakad": [
+      ["ni", "Sa'", "ni", "dha", "Ma"],
+      ["ga", "Ma", "dha", "ni"],
+      ["Ma", "ga", "Sa"]
+    ],
+    "vadi": "Ma",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "ga", "Ma", "dha", "ni"],
+    "forbidden_swars": ["Re", "re", "Ga", "ma", "Pa", "Dha", "Ni"],
+    "time_of_day": "midnight",
+    "thaat": "Bhairavi",
+    "description": "Pentatonic midnight raga; Re and Pa are completely absent",
+    "cents": {"Sa":0,"ga":300,"Ma":500,"dha":800,"ni":1000}
+  },
+  "Todi": {
+    "alternate_names": ["Miyan ki Todi"],
+    "aroha": ["Sa", "re", "ga", "ma", "Pa", "dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "dha", "Pa", "ma", "ga", "re", "Sa"],
+    "pakad": [
+      ["re", "ga", "ma", "Pa", "dha", "Pa"],
+      ["ga", "re", "Sa"],
+      ["ma", "dha", "Ni", "Sa'"]
+    ],
+    "vadi": "dha",
+    "samvadi": "ga",
+    "scale_swars": ["Sa", "re", "ga", "ma", "Pa", "dha", "Ni"],
+    "forbidden_swars": ["Re", "Ga", "Ma", "Dha", "ni"],
+    "time_of_day": "morning",
+    "thaat": "Todi",
+    "description": "Morning raga with tivra ma and komal re, ga, dha",
+    "cents": {"Sa":0,"re":100,"ga":300,"ma":600,"Pa":700,"dha":800,"Ni":1100}
+  },
+  "Marwa": {
+    "alternate_names": [],
+    "aroha": ["Sa", "re", "Ga", "ma", "Dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "ma", "Ga", "re", "Sa"],
+    "pakad": [
+      ["re", "Ga", "ma", "Dha", "Ni"],
+      ["Ni", "re'", "Sa'", "Ni"],
+      ["ma", "Ga", "re", "Sa"]
+    ],
+    "vadi": "re",
+    "samvadi": "Dha",
+    "scale_swars": ["Sa", "re", "Ga", "ma", "Dha", "Ni"],
+    "forbidden_swars": ["Re", "ga", "Ma", "Pa", "dha", "ni"],
+    "time_of_day": "evening",
+    "thaat": "Marwa",
+    "description": "Sunset raga; Pa is completely absent, creates a tense atmosphere",
+    "cents": {"Sa":0,"re":100,"Ga":400,"ma":600,"Dha":900,"Ni":1100}
+  },
+  "Purvi": {
+    "alternate_names": [],
+    "aroha": ["Sa", "re", "Ga", "Ma", "ma", "Pa", "dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "dha", "Pa", "Ma", "ma", "Ga", "re", "Sa"],
+    "pakad": [
+      ["re", "Ga", "Ma", "Pa"],
+      ["dha", "Pa", "Ma", "Ga"],
+      ["Ni", "Sa'"]
+    ],
+    "vadi": "Ga",
+    "samvadi": "Ni",
+    "scale_swars": ["Sa", "re", "Ga", "Ma", "ma", "Pa", "dha", "Ni"],
+    "forbidden_swars": ["Re", "ga", "Dha", "ni"],
+    "time_of_day": "evening",
+    "thaat": "Purvi",
+    "description": "Evening raga using both Ma and tivra ma; komal re and dha",
+    "cents": {"Sa":0,"re":100,"Ga":400,"Ma":500,"ma":600,"Pa":700,"dha":800,"Ni":1100}
+  },
+  "Shree": {
+    "alternate_names": ["Shri"],
+    "aroha": ["Sa", "re", "Ma", "Pa", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Dha", "Pa", "Ma", "re", "Ga", "re", "Sa"],
+    "pakad": [
+      ["Ma", "re", "Sa", "re"],
+      ["Pa", "ni", "Sa'", "ni"],
+      ["Dha", "Pa", "Ma", "re"]
+    ],
+    "vadi": "re",
+    "samvadi": "Pa",
+    "scale_swars": ["Sa", "re", "Ga", "Ma", "Pa", "Dha", "ni"],
+    "forbidden_swars": ["Re", "ga", "ma", "dha", "Ni"],
+    "time_of_day": "evening",
+    "thaat": "Purvi",
+    "description": "Sunset raga with a profound, devotional character",
+    "cents": {"Sa":0,"re":100,"Ga":400,"Ma":500,"Pa":700,"Dha":900,"ni":1000}
+  },
+  "Bihag": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Ga", "Ma", "Pa", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "Pa", "Ma", "ma", "Ga", "Re", "Sa"],
+    "pakad": [
+      ["Ga", "Ma", "Pa", "Ni", "Sa'"],
+      ["Ma", "ma", "Ga"],
+      ["Ni", "Dha", "Pa"]
+    ],
+    "vadi": "Ga",
+    "samvadi": "Ni",
+    "scale_swars": ["Sa", "Re", "Ga", "Ma", "ma", "Pa", "Dha", "Ni"],
+    "forbidden_swars": ["re", "ga", "dha", "ni"],
+    "time_of_day": "night",
+    "thaat": "Bilawal",
+    "description": "Late night raga; uses both Ma and tivra ma in avaroha",
+    "cents": {"Sa":0,"Re":200,"Ga":400,"Ma":500,"ma":600,"Pa":700,"Dha":900,"Ni":1100}
+  },
+  "Kafi": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "ga", "Ma", "Pa", "Dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Dha", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["Pa", "Dha", "ni", "Sa'"],
+      ["ga", "Re", "Sa"],
+      ["ni", "Sa'", "Re'", "ni", "Dha", "Pa"]
+    ],
+    "vadi": "Pa",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "Dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "dha", "Ni"],
+    "time_of_day": "afternoon",
+    "thaat": "Kafi",
+    "description": "Afternoon raga; komal ga and ni give it a light character",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"Dha":900,"ni":1000}
+  },
+  "Khamaj": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "Ga", "Ma", "Pa", "Dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "Pa", "Ma", "Ga", "Re", "Sa"],
+    "pakad": [
+      ["Pa", "Ga", "Ma", "Pa"],
+      ["ni", "Sa'", "Ni", "Dha", "Pa"],
+      ["Ma", "Ga", "Re", "Sa"]
+    ],
+    "vadi": "Ga",
+    "samvadi": "Ni",
+    "scale_swars": ["Sa", "Re", "Ga", "Ma", "Pa", "Dha", "ni", "Ni"],
+    "forbidden_swars": ["re", "ga", "ma", "dha"],
+    "time_of_day": "evening",
+    "thaat": "Khamaj",
+    "description": "Evening raga; uses komal ni in aroha and shuddha Ni in avaroha",
+    "cents": {"Sa":0,"Re":200,"Ga":400,"Ma":500,"Pa":700,"Dha":900,"ni":1000,"Ni":1100}
+  },
+  "Miya ki Malhar": {
+    "alternate_names": ["Miyan Malhar", "Miya Malhar"],
+    "aroha": ["Sa", "Re", "ga", "Ma", "Pa", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Dha", "Pa", "Ma", "ga", "Re", "ni", "Sa"],
+    "pakad": [
+      ["Sa", "Re", "ga", "Ma", "Pa"],
+      ["ni", "Dha", "Pa", "Ma"],
+      ["ga", "Re", "ni", "Sa"]
+    ],
+    "vadi": "Pa",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "Dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "dha", "Ni"],
+    "time_of_day": "monsoon_night",
+    "thaat": "Kafi",
+    "description": "Monsoon raga; associated with rain, ni appears twice in avaroha",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"Dha":900,"ni":1000}
+  },
+  "Durga": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "Ma", "Pa", "Dha", "Sa'"],
+    "avaroha": ["Sa'", "Dha", "Pa", "Ma", "Re", "Sa"],
+    "pakad": [
+      ["Sa", "Re", "Ma", "Pa"],
+      ["Dha", "Pa", "Ma", "Re"],
+      ["Sa", "Ma", "Dha", "Sa'"]
+    ],
+    "vadi": "Re",
+    "samvadi": "Pa",
+    "scale_swars": ["Sa", "Re", "Ma", "Pa", "Dha"],
+    "forbidden_swars": ["re", "Ga", "ga", "ma", "dha", "Ni", "ni"],
+    "time_of_day": "night",
+    "thaat": "Bilawal",
+    "description": "Pentatonic raga; no Ga or Ni, very clean and symmetrical",
+    "cents": {"Sa":0,"Re":200,"Ma":500,"Pa":700,"Dha":900}
+  },
+  "Kirwani": {
+    "alternate_names": ["Kirvani"],
+    "aroha": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "dha", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["Sa", "Re", "ga", "Ma", "Pa"],
+      ["Ni", "dha", "Pa"],
+      ["ga", "Re", "Sa"]
+    ],
+    "vadi": "Pa",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "Ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "Dha", "ni"],
+    "time_of_day": "night",
+    "thaat": "Kirvani",
+    "description": "Similar to harmonic minor; deep, reflective mood",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"dha":800,"Ni":1100}
+  },
+  "Jaunpuri": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "dha", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["Pa", "dha", "Pa", "Ma"],
+      ["ga", "Re", "ga", "Re", "Sa"],
+      ["Sa", "Re", "ga", "Ma", "Pa"]
+    ],
+    "vadi": "dha",
+    "samvadi": "ga",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "Dha", "Ni"],
+    "time_of_day": "morning",
+    "thaat": "Asavari",
+    "description": "Morning raga; similar to Asavari but with specific melodic movements",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"dha":800,"ni":1000}
+  },
+  "Charukeshi": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "Ga", "Ma", "Pa", "dha", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "dha", "Pa", "Ma", "Ga", "Re", "Sa"],
+    "pakad": [
+      ["Pa", "dha", "ni", "Sa'"],
+      ["Ga", "Ma", "Pa"],
+      ["dha", "Pa", "Ga", "Re", "Sa"]
+    ],
+    "vadi": "Pa",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "Re", "Ga", "Ma", "Pa", "dha", "ni"],
+    "forbidden_swars": ["re", "ga", "ma", "Dha", "Ni"],
+    "time_of_day": "afternoon",
+    "thaat": "Charukeshi",
+    "description": "Combines Bilawal aroha with Bhairavi avaroha; melancholic character",
+    "cents": {"Sa":0,"Re":200,"Ga":400,"Ma":500,"Pa":700,"dha":800,"ni":1000}
+  },
+  "Bilawal": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "Ga", "Ma", "Pa", "Dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "Pa", "Ma", "Ga", "Re", "Sa"],
+    "pakad": [
+      ["Ga", "Re", "Sa", "Dha'", "Ni'", "Sa"],
+      ["Sa", "Re", "Ga", "Pa"],
+      ["Dha", "Pa", "Ga", "Ma", "Re", "Sa"]
+    ],
+    "vadi": "Dha",
+    "samvadi": "Ga",
+    "scale_swars": ["Sa", "Re", "Ga", "Ma", "Pa", "Dha", "Ni"],
+    "forbidden_swars": ["re", "ga", "ma", "dha", "ni"],
+    "time_of_day": "morning",
+    "thaat": "Bilawal",
+    "description": "Morning raga; uses all shuddha (natural) swars, closest to major scale",
+    "cents": {"Sa":0,"Re":200,"Ga":400,"Ma":500,"Pa":700,"Dha":900,"Ni":1100}
+  },
+  "Asavari": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Re", "Ma", "Pa", "dha", "Sa'"],
+    "avaroha": ["Sa'", "ni", "dha", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["dha", "Pa", "Ma", "ga", "Re"],
+      ["Sa", "Re", "Ma", "Pa"],
+      ["ni", "dha", "Pa"]
+    ],
+    "vadi": "dha",
+    "samvadi": "ga",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "dha", "ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "Dha", "Ni"],
+    "time_of_day": "morning",
+    "thaat": "Asavari",
+    "description": "Morning raga; ga and ni skipped in aroha, used only in avaroha",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"dha":800,"ni":1000}
+  }
+}
