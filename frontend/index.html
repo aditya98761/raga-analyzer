@@ -27,6 +27,19 @@
       </div>
 
       <div class="header-controls">
+        <!-- Input Mode Toggle -->
+        <div class="control-group">
+          <label class="control-label">Input Mode</label>
+          <div class="mode-toggle" id="mode-toggle">
+            <button class="mode-btn active" id="mode-mic" data-mode="mic" title="Use live microphone">
+              <span class="btn-icon">🎙</span> Live Mic
+            </button>
+            <button class="mode-btn" id="mode-file" data-mode="file" title="Upload an audio file">
+              <span class="btn-icon">📁</span> Upload File
+            </button>
+          </div>
+        </div>
+
         <div class="control-group">
           <label for="raga-select" class="control-label">Target Raga</label>
           <select id="raga-select" class="select-input" title="Choose a raga to practice">
@@ -39,21 +52,42 @@
           <div class="tonic-display" id="tonic-display" title="Current tonic in Hz">— Hz</div>
         </div>
 
-        <button id="btn-calibrate" class="btn btn-secondary" title="Calibrate Sa (hold Sa for 3 seconds)">
-          <span class="btn-icon">🎙</span> Calibrate Sa
-        </button>
+        <!-- Mic-mode controls -->
+        <div id="mic-controls" class="mode-panel">
+          <button id="btn-calibrate" class="btn btn-secondary" title="Calibrate Sa (hold Sa for 3 seconds)">
+            <span class="btn-icon">🎙</span> Calibrate Sa
+          </button>
+          <button id="btn-start" class="btn btn-primary" title="Start / Stop practice session">
+            <span class="btn-icon" id="start-icon">▶</span>
+            <span id="start-label">Start Practice</span>
+          </button>
+        </div>
 
-        <button id="btn-start" class="btn btn-primary" title="Start / Stop practice session">
-          <span class="btn-icon" id="start-icon">▶</span>
-          <span id="start-label">Start Practice</span>
-        </button>
+        <!-- File-mode controls -->
+        <div id="file-controls" class="mode-panel" style="display:none">
+          <input type="file" id="audio-upload" accept="audio/*" style="display:none" />
+          <button id="btn-upload" class="btn btn-primary" title="Select an audio file to analyze">
+            <span class="btn-icon">📂</span>
+            <span id="upload-label">Choose File</span>
+          </button>
+          <a href="/static/sa_calibration_C4_261Hz.wav" download="sa_calibration_C4_261Hz.wav" class="btn btn-secondary" title="Download sample Sa audio file (C4 261Hz) for testing">
+            <span class="btn-icon">⬇</span> Sample Sa WAV
+          </a>
+          <a href="/static/raga_yaman_practice_sample.wav" download="raga_yaman_practice_sample.wav" class="btn btn-secondary" title="Download sample Yaman practice audio file for testing">
+            <span class="btn-icon">⬇</span> Sample Yaman WAV
+          </a>
+          <div class="filename-badge" id="filename-badge" style="display:none" title="Currently loaded file">
+            <span class="filename-icon">♫</span>
+            <span class="filename-text" id="filename-text"></span>
+          </div>
+        </div>
       </div>
     </header>
 
     <!-- ── Status bar ──────────────────────────────────────────────── -->
     <div class="status-bar" role="status" aria-live="polite">
       <div class="status-dot" id="status-dot"></div>
-      <span id="status-text">Not connected — click Start Practice</span>
+      <span id="status-text">Select input mode and raga to begin</span>
       <div class="status-spacer"></div>
       <span id="current-swar-badge" class="swar-badge" aria-label="Current swar being sung">–</span>
     </div>
@@ -144,10 +178,30 @@
     <!-- ── Calibration overlay ─────────────────────────────────────── -->
     <div id="calibration-overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Tonic calibration" style="display:none">
       <div class="overlay-card glass">
-        <h2 class="overlay-title">Calibrate Your Sa</h2>
-        <p class="overlay-desc">Sing or play your <strong>Sa</strong> (tonic) clearly and hold it steady.</p>
-        <div class="calibration-timer" id="cal-timer">3</div>
-        <div class="calibration-wave" id="cal-wave" aria-hidden="true">
+        <h2 class="overlay-title">🎵 Calibrate Your Sa</h2>
+        <p class="overlay-desc">Play a reference tone, listen to it, then sing your <strong>Sa</strong> and hold it steady for 3 seconds.</p>
+
+        <!-- Reference Tone Player -->
+        <div class="sa-reference-block">
+          <div class="sa-ref-label">Reference Sa Pitch</div>
+          <div class="sa-pitch-row">
+            <div class="sa-pitch-btns" id="sa-pitch-btns">
+              <button class="sa-pitch-btn" data-freq="220.00" data-label="A3">A3 <span class="pitch-hz">220 Hz</span><span class="pitch-hint">Low male</span></button>
+              <button class="sa-pitch-btn active" data-freq="261.63" data-label="C4">C4 <span class="pitch-hz">262 Hz</span><span class="pitch-hint">Male voice</span></button>
+              <button class="sa-pitch-btn" data-freq="293.66" data-label="D4">D4 <span class="pitch-hz">294 Hz</span><span class="pitch-hint">Higher</span></button>
+              <button class="sa-pitch-btn" data-freq="329.63" data-label="E4">E4 <span class="pitch-hz">330 Hz</span><span class="pitch-hint">Female</span></button>
+            </div>
+            <button id="btn-play-sa" class="btn btn-sa-play" title="Play reference Sa tone">
+              <span id="sa-play-icon">▶</span> Play Sa
+            </button>
+          </div>
+          <p class="sa-ref-hint">Sing along and match the pitch, then click <strong>Start Calibration</strong>.</p>
+        </div>
+
+        <button id="btn-start-cal" class="btn btn-primary cal-start-btn">🎙 Start Calibration (3 sec)</button>
+
+        <div class="calibration-timer" id="cal-timer" style="display:none">3</div>
+        <div class="calibration-wave" id="cal-wave" aria-hidden="true" style="display:none">
           <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
           <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
           <div class="wave-bar"></div><div class="wave-bar"></div>

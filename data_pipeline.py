@@ -333,34 +333,54 @@ def load_dataset(data_home: str, dry_run: bool = False):
     return dataset, track_ids
 
 
-def extract_raga(track) -> Optional[str]:
-    """Pull raga common_name from Saraga metadata JSON.
+NORM_MAP = {
+    'bhairabi': 'Bhairavi', 'bhairavi': 'Bhairavi',
+    'shree': 'Shree',
+    'todi': 'Todi',
+    'lalat': 'Lalit', 'lalit': 'Lalit',
+    'marwa': 'Marwa',
+    'miya malhar': 'Miya Malhar', 'mian malhar': 'Miya Malhar',
+    'jog': 'Jog',
+    'yaman kalyan': 'Yaman', 'yaman': 'Yaman', 'kalyan': 'Yaman',
+    'bhimpalas': 'Bhimpalasi', 'bhimpalasi': 'Bhimpalasi',
+    'malkauns': 'Malkauns',
+    'bhoop': 'Bhoopali', 'bhoopali': 'Bhoopali',
+    'bihag': 'Bihag',
+    'kedar': 'Kedar',
+    'dhani': 'Dhani',
+}
 
-    Saraga metadata structure (under track.metadata):
-      { 'raags': [{'uuid':..., 'common_name': 'Shree', 'name': 'Sri'}], ... }
-    Falls back to parsing the track title if raags list is absent.
-    """
+TARGET_RAGAS = {'Bhairavi', 'Shree', 'Todi', 'Lalit', 'Marwa', 'Miya Malhar', 'Yaman', 'Bhimpalasi', 'Jog', 'Malkauns'}
+
+
+def extract_raga(track) -> Optional[str]:
+    """Pull raga common_name from Saraga metadata JSON, normalize, and filter to TARGET_RAGAS."""
     meta = track.metadata if hasattr(track, "metadata") and track.metadata else {}
+    raw_raga = None
 
     # Primary: raags[0]['common_name'] — the English raga name
     raags = meta.get("raags", [])
-    if raags and isinstance(raags, list):
-        cn = raags[0].get("common_name", "").strip()
-        if cn:
-            return cn
+    if raags and isinstance(raags, list) and len(raags) > 0:
+        raw_raga = raags[0].get("common_name", "").strip() or raags[0].get("name", "").strip()
 
     # Fallback 1: strip 'Raag ' prefix from title
-    title = meta.get("title", "").strip()
-    if title.lower().startswith("raag "):
-        return title[5:].strip()
+    if not raw_raga:
+        title = meta.get("title", "").strip()
+        if title.lower().startswith("raag "):
+            raw_raga = title[5:].strip()
 
     # Fallback 2: parse track_id e.g. '0_Raag_Shree' -> 'Shree'
-    tid = getattr(track, 'track_id', '')
-    parts = tid.split('_')
-    if len(parts) >= 3 and parts[1].lower() == 'raag':
-        return '_'.join(parts[2:]).replace('_', ' ')
+    if not raw_raga:
+        tid = getattr(track, 'track_id', '')
+        parts = tid.split('_')
+        if len(parts) >= 3 and parts[1].lower() == 'raag':
+            raw_raga = '_'.join(parts[2:]).replace('_', ' ')
 
-    return None
+    if not raw_raga:
+        return None
+
+    norm = NORM_MAP.get(raw_raga.lower(), raw_raga.title().strip())
+    return norm if norm in TARGET_RAGAS else None
 
 
 def extract_artist(track) -> str:

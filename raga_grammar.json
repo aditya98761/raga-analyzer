@@ -393,5 +393,59 @@
     "thaat": "Asavari",
     "description": "Morning raga; ga and ni skipped in aroha, used only in avaroha",
     "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"dha":800,"ni":1000}
+  },
+  "Jog": {
+    "alternate_names": [],
+    "aroha": ["Sa", "Ga", "Ma", "Pa", "ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Pa", "Ma", "Ga", "Sa", "ga", "Sa"],
+    "pakad": [
+      ["Ga", "Ma", "Pa", "ni", "Sa'"],
+      ["Sa'", "ni", "Pa", "Ma"],
+      ["Ga", "Sa", "ga", "Sa"]
+    ],
+    "vadi": "Ma",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "ga", "Ga", "Ma", "Pa", "ni"],
+    "forbidden_swars": ["re", "Re", "ma", "dha", "Dha", "Ni"],
+    "time_of_day": "late_night",
+    "thaat": "Kafi",
+    "description": "Late night raga; uses both shuddha Ga and komal ga",
+    "cents": {"Sa":0,"ga":300,"Ga":400,"Ma":500,"Pa":700,"ni":1000}
+  },
+  "Lalit": {
+    "alternate_names": ["Lalat"],
+    "aroha": ["Sa", "re", "Ga", "Ma", "ma", "Dha", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "Ni", "Dha", "ma", "Dha", "Ma", "Ga", "re", "Sa"],
+    "pakad": [
+      ["re", "Ga", "Ma", "ma", "Dha"],
+      ["Ma", "ma", "Dha", "Ni", "Sa'"],
+      ["Dha", "Ma", "Ga", "re", "Sa"]
+    ],
+    "vadi": "Ma",
+    "samvadi": "Sa",
+    "scale_swars": ["Sa", "re", "Ga", "Ma", "ma", "Dha", "Ni"],
+    "forbidden_swars": ["Re", "ga", "Pa", "dha", "ni"],
+    "time_of_day": "dawn",
+    "thaat": "Marwa",
+    "description": "Pre-dawn raga; uses both shuddha Ma and tivra ma in characteristic sequence",
+    "cents": {"Sa":0,"re":100,"Ga":400,"Ma":500,"ma":600,"Dha":900,"Ni":1100}
+  },
+  "Miya Malhar": {
+    "alternate_names": ["Miya ki Malhar", "Mian Malhar"],
+    "aroha": ["Sa", "Re", "ga", "Ma", "Pa", "Ni", "Sa'"],
+    "avaroha": ["Sa'", "ni", "Dha", "ni", "Pa", "Ma", "ga", "Re", "Sa"],
+    "pakad": [
+      ["Sa", "Re", "ga", "Re", "Sa"],
+      ["Ma", "Pa", "ni", "Dha", "ni", "Pa"],
+      ["Ma", "Pa", "ga", "Re", "Sa"]
+    ],
+    "vadi": "Re",
+    "samvadi": "Pa",
+    "scale_swars": ["Sa", "Re", "ga", "Ma", "Pa", "Dha", "ni", "Ni"],
+    "forbidden_swars": ["re", "Ga", "ma", "dha"],
+    "time_of_day": "monsoon",
+    "thaat": "Kafi",
+    "description": "Monsoon raga; uses both ni and Ni, famous for andolan on komal ga",
+    "cents": {"Sa":0,"Re":200,"ga":300,"Ma":500,"Pa":700,"Dha":900,"ni":1000,"Ni":1100}
   }
 }

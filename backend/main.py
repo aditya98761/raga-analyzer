@@ -38,9 +38,10 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, File, UploadFile, Form
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+import librosa
 
 # ── Path setup ────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
@@ -128,6 +129,18 @@ class RagaClassifier:
 
 app = FastAPI(title="Raga Practice Analyzer", version="1.0.0")
 
+
+@app.middleware("http")
+async def no_cache_middleware(request, call_next):
+    """Prevent browser from caching static files during development."""
+    response = await call_next(request)
+    if request.url.path.startswith("/static") or request.url.path == "/":
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
+
 _classifier = RagaClassifier()
 _grammar_cache: dict = {}
 _scorer_pool: dict[str, RagaScorer] = {}   # one scorer per connected client id
@@ -158,7 +171,7 @@ async def index():
     html = FRONTEND_DIR / "index.html"
     if not html.exists():
         raise HTTPException(404, "Frontend not found — did you build it?")
-    return FileResponse(str(html))
+    return FileResponse(str(html), headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 
 # ─── REST API ─────────────────────────────────────────────────────────────────
@@ -192,6 +205,82 @@ async def calibrate_tonic_endpoint(request_body: dict):
     if tonic <= 0:
         raise HTTPException(422, "Could not detect tonic — ensure audio contains a clear Sa")
     return {"tonic_hz": tonic}
+
+
+@app.post("/api/upload-audio")
+async def upload_audio_endpoint(
+    file: UploadFile = File(...),
+    raga: str = Form(...),
+    tonic_hz: float = Form(0.0)
+):
+    """Accept an uploaded audio file (WAV, MP3, etc.), analyze it, and return frame scores."""
+    import tempfile
+    import os
+
+    contents = await file.read()
+    suffix = Path(file.filename).suffix if file.filename else ".wav"
+
+    # Write to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(contents)
+        tmp_name = tmp.name
+
+    try:
+        # Load audio at 16000 Hz, mono
+        audio, sr = librosa.load(tmp_name, sr=SAMPLE_RATE, mono=True)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not load audio file: {e}")
+    finally:
+        try:
+            os.unlink(tmp_name)
+        except Exception:
+            pass
+
+    # Limit duration to 60 seconds to prevent high latency/CPU usage
+    MAX_SAMPLES = 60 * SAMPLE_RATE
+    if len(audio) > MAX_SAMPLES:
+        audio = audio[:MAX_SAMPLES]
+
+    # Autocalibrate tonic if not provided / <= 0
+    auto_tonic = False
+    if tonic_hz <= 0:
+        tonic_hz = calibrate_tonic([audio], sr=SAMPLE_RATE)
+        if tonic_hz <= 0:
+            # Fallback: use C4 (261.63 Hz), the most common Sa in Hindustani vocal music
+            tonic_hz = 261.63
+            auto_tonic = True
+            print(f"[Upload] Auto-tonic detection failed, using default Sa = {tonic_hz} Hz")
+
+    # Initialize processing engine and scorer
+    engine = PitchEngine(tonic_hz=tonic_hz, device="cpu")  # use CPU to avoid blocking GPU
+    scorer = RagaScorer(grammar_path=str(GRAMMAR_PATH))
+    if not scorer.set_target_raga(raga):
+        raise HTTPException(status_code=400, detail=f"Raga '{raga}' not found in grammar database.")
+
+    frames_output = []
+
+    # Chunk-by-chunk processing (2048 samples = ~128ms)
+    num_samples = len(audio)
+    for start_sample in range(0, num_samples, CHUNK_SAMPLES):
+        chunk = audio[start_sample : start_sample + CHUNK_SAMPLES]
+        if len(chunk) < CHUNK_SAMPLES:
+            chunk = np.pad(chunk, (0, CHUNK_SAMPLES - len(chunk)))
+
+        frame = engine.process_chunk(chunk.tobytes())
+        scorer.push_swar(frame.swar_idx, frame.voiced)
+        score_res = scorer.score()
+
+        frames_output.append({
+            "frame": frame.to_dict(),
+            "score": score_res.to_dict() if score_res else None
+        })
+
+    return {
+        "tonic_hz": tonic_hz,
+        "auto_tonic": auto_tonic,
+        "raga": raga,
+        "frames": frames_output
+    }
 
 
 # ─── WebSocket Handler ────────────────────────────────────────────────────────

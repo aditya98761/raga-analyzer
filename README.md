@@ -113,11 +113,10 @@ python raga_scorer.py --test-raga Bhairav
 ### 7. Start the Server
 
 ```bash
-cd backend
-python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Open `` in Chrome or Edge.
+Open `http://localhost:8000` in Chrome or Edge.
 
 ---
 

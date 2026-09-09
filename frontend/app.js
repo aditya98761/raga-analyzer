@@ -35,6 +35,9 @@ let tonicHz      = 0;
 let isRunning    = false;
 let isCalibrating = false;
 let calChunks    = [];       // Float32 PCM collected during calibration
+let isPlayingFile = false;
+let filePlaybackInterval = null;
+let inputMode    = 'mic';    // 'mic' or 'file'
 
 // ─── DOM References ───────────────────────────────────────────────────────────
 
@@ -42,6 +45,8 @@ const elRagaSelect    = document.getElementById('raga-select');
 const elTonicDisplay  = document.getElementById('tonic-display');
 const elBtnStart      = document.getElementById('btn-start');
 const elBtnCalibrate  = document.getElementById('btn-calibrate');
+const elBtnUpload     = document.getElementById('btn-upload');
+const elAudioUpload   = document.getElementById('audio-upload');
 const elStatusDot     = document.getElementById('status-dot');
 const elStatusText    = document.getElementById('status-text');
 const elCurrentSwar   = document.getElementById('current-swar-badge');
@@ -68,6 +73,21 @@ const elVadiVal       = document.getElementById('vadi-val');
 const elSamvadiVal    = document.getElementById('samvadi-val');
 const elBgCanvas      = document.getElementById('bg-canvas');
 
+// Mode toggle elements
+const elModeMic       = document.getElementById('mode-mic');
+const elModeFile      = document.getElementById('mode-file');
+const elMicControls   = document.getElementById('mic-controls');
+const elFileControls  = document.getElementById('file-controls');
+const elFilenameBadge = document.getElementById('filename-badge');
+const elFilenameText  = document.getElementById('filename-text');
+const elUploadLabel   = document.getElementById('upload-label');
+
+// Sa Reference Tone elements
+const elBtnStartCal   = document.getElementById('btn-start-cal');
+const elBtnPlaySa     = document.getElementById('btn-play-sa');
+const elSaPitchBtns   = document.getElementById('sa-pitch-btns');
+const elCalWave       = document.getElementById('cal-wave');
+
 // ─── Startup ──────────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -76,10 +96,61 @@ window.addEventListener('DOMContentLoaded', () => {
   loadRagas();
 
   elBtnStart.addEventListener('click', toggleSession);
-  elBtnCalibrate.addEventListener('click', startCalibration);
+  elBtnCalibrate.addEventListener('click', openCalibrationModal);
   elBtnCalCancel.addEventListener('click', cancelCalibration);
   elRagaSelect.addEventListener('change', onRagaSelect);
+  elBtnUpload.addEventListener('click', triggerUpload);
+  elAudioUpload.addEventListener('change', handleFileUpload);
+
+  // Mode toggle events
+  elModeMic.addEventListener('click', () => switchMode('mic'));
+  elModeFile.addEventListener('click', () => switchMode('file'));
+
+  // Sa Reference Tone events
+  if (elBtnPlaySa) elBtnPlaySa.addEventListener('click', togglePlaySa);
+  if (elBtnStartCal) elBtnStartCal.addEventListener('click', startCalibrationRecording);
+
+  if (elSaPitchBtns) {
+    elSaPitchBtns.querySelectorAll('.sa-pitch-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        elSaPitchBtns.querySelectorAll('.sa-pitch-btn').forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget;
+        target.classList.add('active');
+        selectedSaFreq = parseFloat(target.dataset.freq) || 261.63;
+        if (saOscillator) {
+          playSaTone(selectedSaFreq);
+        }
+      });
+    });
+  }
 });
+
+// ─── Mode Switching ───────────────────────────────────────────────────────────
+
+function switchMode(mode) {
+  if (mode === inputMode) return;
+
+  // Stop any running session when switching modes
+  if (isRunning)     stopSession();
+  if (isPlayingFile) stopFilePlayback();
+
+  inputMode = mode;
+
+  // Toggle button active states
+  elModeMic.classList.toggle('active', mode === 'mic');
+  elModeFile.classList.toggle('active', mode === 'file');
+
+  // Show/hide mode panels
+  elMicControls.style.display  = mode === 'mic'  ? 'flex' : 'none';
+  elFileControls.style.display = mode === 'file' ? 'flex' : 'none';
+
+  // Update status message
+  if (mode === 'mic') {
+    setStatus('idle', 'Live Mic mode — click Start Practice to begin');
+  } else {
+    setStatus('idle', 'Upload mode — choose an audio file to analyze');
+  }
+}
 
 // ─── Raga Selector ────────────────────────────────────────────────────────────
 
@@ -181,6 +252,10 @@ function clearRagaGraph() {
 // ─── Session Control ──────────────────────────────────────────────────────────
 
 async function toggleSession() {
+  if (isPlayingFile) {
+    stopFilePlayback();
+    return;
+  }
   if (isRunning) {
     stopSession();
   } else {
@@ -382,25 +457,132 @@ function drawGauge(pct) {
   ctx.stroke();
 }
 
-// ─── Tonic Calibration ────────────────────────────────────────────────────────
+// ─── Tonic Calibration & Sa Reference Tone ──────────────────────────────────
 
-function startCalibration() {
-  if (!isRunning) {
-    // Need to start session first for mic access
-    alert('Please start a practice session first, then calibrate.');
-    return;
+let saOscillator  = null;
+let saGainNode    = null;
+let saAudioCtx    = null;
+let selectedSaFreq = 261.63; // Default C4
+
+function togglePlaySa() {
+  if (saOscillator) {
+    stopSaTone();
+  } else {
+    playSaTone(selectedSaFreq);
   }
-  isCalibrating  = true;
-  calChunks      = [];
+}
+
+function playSaTone(freq) {
+  stopSaTone();
+  try {
+    saAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Fundamental
+    const osc1 = saAudioCtx.createOscillator();
+    const gain1 = saAudioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(freq, saAudioCtx.currentTime);
+    gain1.gain.setValueAtTime(0.5, saAudioCtx.currentTime);
+    
+    // 2nd Harmonic (Tanpura octave warmth)
+    const osc2 = saAudioCtx.createOscillator();
+    const gain2 = saAudioCtx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(freq * 2, saAudioCtx.currentTime);
+    gain2.gain.setValueAtTime(0.15, saAudioCtx.currentTime);
+    
+    // Master gain with smooth fade in
+    saGainNode = saAudioCtx.createGain();
+    saGainNode.gain.setValueAtTime(0.01, saAudioCtx.currentTime);
+    saGainNode.gain.exponentialRampToValueAtTime(0.5, saAudioCtx.currentTime + 0.1);
+    
+    osc1.connect(gain1);
+    gain1.connect(saGainNode);
+    osc2.connect(gain2);
+    gain2.connect(saGainNode);
+    
+    saGainNode.connect(saAudioCtx.destination);
+    
+    osc1.start();
+    osc2.start();
+    
+    saOscillator = { stop: () => { try { osc1.stop(); osc2.stop(); } catch(e){} } };
+    
+    if (elBtnPlaySa) {
+      elBtnPlaySa.classList.add('playing');
+      const iconSpan = elBtnPlaySa.querySelector('#sa-play-icon');
+      if (iconSpan) iconSpan.textContent = '⏹';
+    }
+  } catch (e) {
+    console.error('Failed to play Sa tone:', e);
+  }
+}
+
+function stopSaTone() {
+  if (saGainNode && saAudioCtx) {
+    try {
+      saGainNode.gain.exponentialRampToValueAtTime(0.001, saAudioCtx.currentTime + 0.05);
+    } catch(e) {}
+  }
+  if (saOscillator) {
+    try { saOscillator.stop(); } catch(e) {}
+    saOscillator = null;
+  }
+  if (saAudioCtx) {
+    try { saAudioCtx.close(); } catch(e) {}
+    saAudioCtx = null;
+  }
+  if (elBtnPlaySa) {
+    elBtnPlaySa.classList.remove('playing');
+    const iconSpan = elBtnPlaySa.querySelector('#sa-play-icon');
+    if (iconSpan) iconSpan.textContent = '▶';
+  }
+}
+
+function openCalibrationModal() {
   elCalOverlay.style.display = 'flex';
   elCalResult.style.display  = 'none';
-  elCalTimer.textContent     = CAL_SECONDS;
+  if (elCalTimer)   elCalTimer.style.display   = 'none';
+  if (elCalWave)    elCalWave.style.display    = 'none';
+  if (elBtnStartCal) elBtnStartCal.style.display = 'block';
+  
+  const refBlock = document.querySelector('.sa-reference-block');
+  if (refBlock) refBlock.style.display = 'flex';
+}
+
+function startCalibrationRecording() {
+  stopSaTone();
+
+  if (!isRunning) {
+    // Automatically start mic session if not already running
+    startSession().then(() => {
+      if (isRunning) runCalibrationTimer();
+    });
+    return;
+  }
+  runCalibrationTimer();
+}
+
+function runCalibrationTimer() {
+  isCalibrating = true;
+  calChunks     = [];
+
+  const refBlock = document.querySelector('.sa-reference-block');
+  if (refBlock) refBlock.style.display = 'none';
+  if (elBtnStartCal) elBtnStartCal.style.display = 'none';
+
+  if (elCalTimer) {
+    elCalTimer.style.display = 'block';
+    elCalTimer.textContent   = CAL_SECONDS;
+  }
+  if (elCalWave) elCalWave.style.display = 'flex';
+
   setStatus('calibrating', 'Calibrating tonic — sing Sa now…');
 
   let remaining = CAL_SECONDS;
   const interval = setInterval(() => {
     remaining--;
-    elCalTimer.textContent = remaining;
+    if (elCalTimer) elCalTimer.textContent = remaining;
     if (remaining <= 0) {
       clearInterval(interval);
       finishCalibration();
@@ -410,6 +592,7 @@ function startCalibration() {
 
 async function finishCalibration() {
   isCalibrating = false;
+  if (elCalWave) elCalWave.style.display = 'none';
 
   if (calChunks.length === 0) {
     elCalResult.textContent    = '✗ No audio captured';
@@ -458,6 +641,7 @@ async function finishCalibration() {
 }
 
 function cancelCalibration() {
+  stopSaTone();
   isCalibrating = false;
   calChunks     = [];
   elCalOverlay.style.display = 'none';
@@ -536,9 +720,6 @@ function initBackground() {
     alpha: Math.random() * 0.5 + 0.1,
   }));
 
-  // Slowly drifting particles with occasional gold sparks
-  const sparks = [];
-
   const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -587,3 +768,207 @@ function initBackground() {
 window.addEventListener('DOMContentLoaded', () => {
   drawGauge(0);
 });
+
+
+// ─── Practice Audio File Upload & Playback ────────────────────────────────────
+
+let playbackAudio = null;
+let playbackAudioUrl = null;
+
+function triggerUpload() {
+  // If currently playing back a file, stop it
+  if (isPlayingFile) {
+    stopFilePlayback();
+    return;
+  }
+
+  const raga = elRagaSelect.value;
+  if (!raga) {
+    alert('Please select a target raga first before uploading practice audio!');
+    return;
+  }
+  elAudioUpload.click();
+}
+
+async function handleFileUpload(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+
+  const raga = elRagaSelect.value;
+
+  // Show filename in the badge
+  const displayName = file.name.length > 30
+    ? file.name.slice(0, 27) + '...'
+    : file.name;
+  elFilenameText.textContent = displayName;
+  elFilenameBadge.style.display = 'flex';
+  elFilenameBadge.title = file.name;
+
+  // Update upload button to show loading state
+  elUploadLabel.textContent = 'Analyzing...';
+  elBtnUpload.disabled = true;
+
+  setStatus('connected', `Analyzing "${displayName}"...`);
+
+  // Create local object URL for synchronized audio playback
+  if (playbackAudioUrl) URL.revokeObjectURL(playbackAudioUrl);
+  playbackAudioUrl = URL.createObjectURL(file);
+
+  // Synchronously initialize and play/pause the Audio element inside the user gesture event handler
+  // to satisfy the browser's Autoplay restriction policy.
+  playbackAudio = new Audio(playbackAudioUrl);
+  playbackAudio.volume = 1.0;
+  playbackAudio.play().then(() => {
+    playbackAudio.pause();
+    playbackAudio.currentTime = 0;
+  }).catch(err => {
+    console.warn('[Autoplay] Pre-play unlock failed:', err.message);
+  });
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('raga', raga);
+  fd.append('tonic_hz', tonicHz);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/upload-audio`, {
+      method: 'POST',
+      body: fd,
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.detail || 'Upload failed');
+    }
+
+    const data = await res.json();
+    if (data.tonic_hz > 0) {
+      tonicHz = data.tonic_hz;
+      updateTonicDisplay(tonicHz);
+    }
+
+    // Playback visual analysis synchronised with the unlocked audio
+    startFilePlayback(data.frames);
+
+  } catch (err) {
+    console.error('[Upload] Error:', err);
+    setStatus('error', `Analysis failed: ${err.message}`);
+    elUploadLabel.textContent = 'Choose File';
+    elBtnUpload.disabled = false;
+    if (playbackAudio) {
+      playbackAudio.pause();
+      playbackAudio = null;
+    }
+    if (playbackAudioUrl) {
+      URL.revokeObjectURL(playbackAudioUrl);
+      playbackAudioUrl = null;
+    }
+  } finally {
+    // Reset file input value so same file can be uploaded again
+    elAudioUpload.value = '';
+  }
+}
+
+function startFilePlayback(frames) {
+  if (isPlayingFile) stopFilePlayback();
+  if (isRunning) stopSession(); // stop live mic session if active
+
+  isPlayingFile = true;
+
+  // Update upload button to show "Stop Playback" state
+  elUploadLabel.textContent = 'Stop Playback';
+  elBtnUpload.disabled = false;
+  elBtnUpload.classList.add('recording');
+
+  const fname = elFilenameText.textContent || 'audio file';
+  setStatus('connected', `Playing "${fname}" with analysis...`);
+
+  // Start audio playback (unlocked previously)
+  if (playbackAudio) {
+    playbackAudio.currentTime = 0;
+    playbackAudio.play().catch(err => {
+      console.warn('[Playback] Play failed after delay:', err.message);
+      // Fallback: try creating a fresh Audio element if the unlocked one was lost
+      if (playbackAudioUrl) {
+        playbackAudio = new Audio(playbackAudioUrl);
+        playbackAudio.volume = 1.0;
+        playbackAudio.play().catch(e => console.error('[Playback] Fallback play failed:', e));
+      }
+    });
+  }
+
+  let lastRenderedFrameIdx = -1;
+
+  // Run a high-frequency polling loop (30ms) to snap the graphs in perfect sync with the audio currentTime
+  filePlaybackInterval = setInterval(() => {
+    if (!playbackAudio) return;
+
+    // Snaps to the frame corresponding to the current playback time
+    // Frame duration = CHUNK_SAMPLES / SAMPLE_RATE = 2048 / 16000 = 0.128s
+    let frameIdx = Math.floor(playbackAudio.currentTime / 0.128);
+
+    if (frameIdx >= frames.length || playbackAudio.ended) {
+      stopFilePlayback();
+      setStatus('idle', 'Playback complete');
+      return;
+    }
+
+    // Only update when transitioning to a new frame
+    if (frameIdx === lastRenderedFrameIdx) return;
+    lastRenderedFrameIdx = frameIdx;
+
+    const { frame, score } = frames[frameIdx];
+
+    // Push frame to scrolling pitch contour
+    if (pitchGraph) pitchGraph.push(frame);
+
+    // Update swar badge
+    const swar = frame.voiced ? (frame.swar || '–') : '–';
+    elCurrentSwar.textContent = swar;
+    elCurrentSwar.style.opacity = frame.voiced ? '1' : '0.4';
+
+    // Highlight nodes in the raga graph
+    if (ragaGraph && frame.swar && frame.voiced && ragaGrammar) {
+      const inScale = ragaGrammar.scale_swars?.includes(frame.swar);
+      ragaGraph.highlightSwar(frame.swar, inScale);
+    }
+
+    // Update stability score meter
+    if (frame.voiced) {
+      updateStability(frame.stability ?? 100);
+    }
+
+    // Update match score meter
+    if (score && score.match_percent !== undefined) {
+      updateMatchScore(score);
+    }
+  }, 30);
+}
+
+function stopFilePlayback() {
+  isPlayingFile = false;
+
+  // Stop and cleanup audio playback
+  if (playbackAudio) {
+    playbackAudio.pause();
+    playbackAudio = null;
+  }
+  if (playbackAudioUrl) {
+    URL.revokeObjectURL(playbackAudioUrl);
+    playbackAudioUrl = null;
+  }
+
+  if (filePlaybackInterval) {
+    clearInterval(filePlaybackInterval);
+    filePlaybackInterval = null;
+  }
+
+  setStatus('idle', 'Playback complete — choose another file or switch to Live Mic');
+
+  // Reset upload button
+  elUploadLabel.textContent = 'Choose File';
+  elBtnUpload.disabled = false;
+  elBtnUpload.classList.remove('recording');
+
+  elCurrentSwar.textContent = '–';
+}

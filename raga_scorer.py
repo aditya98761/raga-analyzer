@@ -80,7 +80,7 @@ W_PAKAD    = 0.25
 W_VADI     = 0.15
 
 # DTW normalisation constant (lower -> faster decay / stricter scoring)
-DTW_NORM_K = 5.0
+DTW_NORM_K = 8.5
 
 
 # --- Pure-Python DTW fallback -------------------------------------------------
@@ -146,9 +146,23 @@ class RagaGrammar:
             [SWAR_IDX[s] for s in phrase if s in SWAR_IDX]
             for phrase in self.pakad
         ]
-        # Valid bigrams = all consecutive pairs in aroha + avaroha
-        all_seq = self.aroha_idx + self.avaroha_idx
-        self.allowed_bigrams = set(zip(all_seq[:-1], all_seq[1:]))
+        # Valid bigrams = all transitions between non-forbidden scale swars + self loops + pakad phrases
+        bigrams = set()
+        for seq in (self.aroha_idx, self.avaroha_idx):
+            if len(seq) > 1:
+                bigrams.update(zip(seq[:-1], seq[1:]))
+        for phrase in self.pakad_idx:
+            if len(phrase) > 1:
+                bigrams.update(zip(phrase[:-1], phrase[1:]))
+        for s in self.scale_idx:
+            bigrams.add((s, s))
+        # Allow transitions between all valid scale notes
+        scale_list = [s for s in self.scale_idx if s not in self.forbidden_idx]
+        for s1 in scale_list:
+            for s2 in scale_list:
+                bigrams.add((s1, s2))
+
+        self.allowed_bigrams = bigrams
 
 
 def load_grammar(grammar_path: str = "raga_grammar.json") -> dict[str, RagaGrammar]:
@@ -287,11 +301,10 @@ class RagaScorer:
             return 100.0
         n_vadi    = voiced.count(g.vadi_idx)
         n_samvadi = voiced.count(g.samvadi_idx) if g.samvadi_idx >= 0 else 0
-        # Expected: vadi ≥ ~15% of sung frames; samvadi ≥ ~7%
         vadi_frac    = n_vadi    / len(voiced)
         samvadi_frac = n_samvadi / len(voiced)
-        vadi_score    = min(1.0, vadi_frac    / 0.15) * 100
-        samvadi_score = min(1.0, samvadi_frac / 0.07) * 100
+        vadi_score    = 75.0 + min(25.0, (vadi_frac / 0.12) * 25.0)
+        samvadi_score = 75.0 + min(25.0, (samvadi_frac / 0.06) * 25.0)
         return round((vadi_score * 0.65 + samvadi_score * 0.35), 1)
 
     # -- Public API ------------------------------------------------------------
